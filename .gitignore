@@ -1,0 +1,18 @@
+# Jupyter temporary files
+.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+.venv/
+
+# Research datasets
+data/
+datasets/
+
+# Temporary files
+.DS_Store
+*.log
