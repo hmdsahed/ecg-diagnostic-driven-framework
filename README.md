@@ -201,20 +201,55 @@ The experiments currently use:
 
 ## 7. Repository Structure
 
+## 7. Repository Structure
+
+The repository is organized to separate research notebooks, reusable implementation code, datasets, experimental configurations, and results.
+
 ```text
 ecg-diagnostic-driven-framework/
 │
-├── 01_Data_Inspection_and_Statistical_Analysis.ipynb
-├── 02_Hybrid_Model_Selection.ipynb
-├── 03_Reusable_Generalization_Framework.ipynb
+├── notebooks/
+│   ├── 01_Data_Inspection_and_Statistical_Analysis.ipynb
+│   ├── 02_Hybrid_Model_Selection.ipynb
+│   └── 03_Reusable_Generalization_Framework.ipynb
+│
+├── src/
+│   ├── preprocessing/
+│   ├── features/
+│   ├── models/
+│   └── evaluation/
+│
+├── data/
+│   ├── raw/
+│   └── processed/
+│
+├── results/
+│   ├── statistical_analysis/
+│   ├── model_comparison/
+│   └── diagnostic_selection/
+│
+├── configs/
 │
 ├── .gitignore
-├── README.md
-│
-├── data/          # Local datasets (not tracked by Git)
-├── results/       # Experimental outputs
-└── src/           # Future reusable implementation
+├── requirements.txt
+└── README.md
 ```
+
+### Directory Description
+
+- `notebooks/`: Research notebooks documenting the experimental workflow.
+- `src/preprocessing/`: Reusable ECG preprocessing functions.
+- `src/features/`: ECG feature extraction implementations.
+- `src/models/`: Traditional, deep learning, and hybrid model implementations.
+- `src/evaluation/`: Model evaluation and statistical comparison functions.
+- `data/raw/`: Original ECG recordings and annotations.
+- `data/processed/`: Preprocessed signals and extracted features.
+- `results/statistical_analysis/`: Statistical analysis outputs.
+- `results/model_comparison/`: Model training and comparison results.
+- `results/diagnostic_selection/`: Diagnostic-driven selection results.
+- `configs/`: Experimental configurations and parameters.
+
+Large datasets and model checkpoints will be managed separately and will not be committed to GitHub.
 
 The notebooks are organized according to the research workflow:
 
