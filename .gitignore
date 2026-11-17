@@ -16,3 +16,33 @@ datasets/
 # Temporary files
 .DS_Store
 *.log
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Jupyter temporary files
+.ipynb_checkpoints/
+
+# ECG datasets
+data/raw/*
+!data/raw/README.md
+
+data/processed/*
+!data/processed/README.md
+
+# Model checkpoints and weights
+*.pth
+*.pt
+*.h5
+*.keras
+*.ckpt
+*.onnx
+
+# Temporary files
+*.tmp
+*.log
+
+# Environment files
+.venv/
+venv/
+.env
