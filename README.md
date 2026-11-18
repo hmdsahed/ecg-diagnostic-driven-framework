@@ -280,7 +280,7 @@ The first experiment has established an initial statistical foundation for inves
 However, no predictive model training or comparative model evaluation has been completed at this stage.
 
 This repository is under active development. The proposed framework and experimental findings are preliminary and may be updated as the research progresses.
-5.2 Notebook 02 --- Hybrid Model Selection and Experimental Design
+### Notebook 02 --- Hybrid Model Selection and Experimental Design
 Notebook: 02_Hybrid_Model_Selection.ipynb
 
 Status: Initial heartbeat dataset preparation and signal-quality
