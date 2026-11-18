@@ -280,6 +280,228 @@ The first experiment has established an initial statistical foundation for inves
 However, no predictive model training or comparative model evaluation has been completed at this stage.
 
 This repository is under active development. The proposed framework and experimental findings are preliminary and may be updated as the research progresses.
+5.2 Notebook 02 --- Hybrid Model Selection and Experimental Design
+Notebook: 02_Hybrid_Model_Selection.ipynb
+
+Status: Initial heartbeat dataset preparation and signal-quality
+investigation completed. Model training has not started.
+Recording and subject selection
+The initial experiment uses 44 recordings drawn from the conventional
+DS1 and DS2 recording lists. Four recordings---102, 104, 107, and
+217---are not included in those lists.
+
+There is an important subject-level consideration: recordings 201 and
+202 belong to the same subject but appear in different conventional
+groups. Therefore, the conventional DS1/DS2 assignment is not
+automatically subject-independent under the subject mapping used here.
+
+The current dataset contains 44 recordings from 43 unique subjects.
+Subject identifiers are retained so that evaluation can keep all
+recordings from the same subject together.
+
+The exact benchmark protocol and annotation inclusion rules still
+require verification before benchmark claims are made.
+Provisional four-class heartbeat dataset
+A provisional AAMI mapping was used:
+
+  AAMI class   Annotation symbols
+  N            N, L, R, e, j
+S            A, a, J, S
+V            V, E
+F            F
+Q            /, f, Q
+
+The initial modelling experiment uses N, S, V, and F. The Q class was
+excluded provisionally because it combines paced and unclassifiable
+categories and is dominated by paced beats. This is an experimental
+scope decision, not a claim that Q is unimportant. The final mapping and
+inclusion/exclusion rules must be verified and justified.
+
+The 44-recording annotation extraction produced:
+
+  Class         Annotated beats   Percentage
+  N                      90,125      89.483%
+S                       2,781       2.761%
+V                       7,009       6.959%
+F                         803       0.797%
+Total         100,718     100%
+Heartbeat segmentation
+The first ECG channel (MLII) was used for the initial segmentation. Each
+heartbeat segment contains 90 samples before and 90 samples after its
+annotation position.
+- Sampling frequency: 360 Hz
+- Segment length: 180 samples
+- Approximate segment duration: 0.5 seconds
+- Initial annotations: 100,718
+- Complete segments extracted: 100,693
+- Boundary segments excluded: 25
+The resulting signal matrix has shape (100693, 180). Each row
+represents one annotated heartbeat. Its recording, subject, annotation
+position, original symbol, and AAMI class are stored in a metadata
+table.
+Preliminary waveform and segment statistics
+Representative segments from all four classes were visualized. Waveform
+morphology and amplitude varied across classes, but substantial overlap
+was also observed.
+
+The following descriptive features were calculated for each segment:
+mean amplitude, standard deviation, minimum amplitude, maximum
+amplitude, and peak-to-peak amplitude.
+
+  Class     Mean standard deviation   Mean peak-to-peak
+  F                          0.6240              2.9952
+N                          0.3462              2.0059
+S                          0.2335              1.5100
+V                          0.6320              2.5922
+
+These values are descriptive only. Their distributions overlap and do
+not establish reliable class separability.
+Signal representation comparison
+Three signal representations were created without overwriting the
+original segments:
+- P0 --- Raw: Original ECG segments.
+- P1 --- Mean-centered: The mean of each heartbeat segment was
+  subtracted.
+- P2 --- Edge-corrected: The average of the first and last 30
+  samples was subtracted from the segment.
+The edge-based measure is exploratory. Because the segment edges may
+contain neighbouring cardiac activity, it should not be interpreted as a
+direct measurement of baseline wander.
+
+  Statistic                       P0: Raw   P1: Mean-centered   P2: Edge-corrected
+  Overall mean                   -0.32471             0.00000              0.03531
+Overall standard deviation      0.50314             0.40066              0.42166
+Minimum                        -5.12000            -3.37314             -3.94950
+Maximum                         5.11500             6.76528              5.82442
+
+The preprocessing operations changed the amplitude distributions. In
+particular, mean-centering and edge correction sometimes increased
+maximum absolute amplitude. Their value must therefore be assessed
+experimentally rather than assumed.
+Investigation of recording 116
+Recording 116 showed unusual repeated extreme amplitudes compared with
+recording 100.
+
+  Statistic                   Recording 100   Recording 116
+  Minimum amplitude (mV)             -2.715          -5.120
+Maximum amplitude (mV)              1.435           5.115
+Mean amplitude (mV)               -0.3063         -0.9363
+Standard deviation (mV)            0.1932          0.6641
+
+Recording 116 contained 663 samples at -5.120 mV and 265 samples at
+5.115 mV. Consecutive extreme-value episodes lasted up to 255 samples at
+the minimum and 265 samples at the maximum. This provides evidence
+consistent with possible ADC saturation or clipping; the final
+signal-quality interpretation should remain appropriately cautious.
+
+Six extracted heartbeat segments in recording 116 overlapped these
+identified extreme-value regions. All six were class N.
+Sensitivity dataset
+The original dataset was retained as the primary dataset. A separate
+sensitivity dataset was created after excluding the six flagged
+heartbeat segments.
+
+  Dataset                 Heartbeat segments
+  Primary dataset                    100,693
+Sensitivity dataset                100,687
+Difference                               6
+
+The class distribution changed negligibly after excluding the six
+segments:
+
+  Class     Primary   Sensitivity   Primary %   Sensitivity %
+  N          90,102        90,096    89.48189        89.48126
+S           2,781         2,781     2.76186         2.76202
+V           7,008         7,008     6.95977         6.96018
+F             802           802     0.79648         0.79653
+
+The largest percentage-point change was 0.00063 for class N. The
+sensitivity dataset will allow us to investigate whether the flagged
+segments affect model results without materially changing class
+proportions.
+Saved local data files
+The following files were saved locally in
+ECG_Research/processed_data/:
+
+  File                                   Description
+  X_ecg_raw.npy                        Primary raw ECG heartbeat segments
+heartbeat_metadata.csv               Primary dataset metadata
+X_ecg_raw_sensitivity.npy            Sensitivity ECG segments
+heartbeat_metadata_sensitivity.csv   Sensitivity dataset metadata
+
+These are local experimental outputs. Large datasets and model
+checkpoints should not be committed to GitHub unless there is a clear
+reason and suitable data-distribution permission.
+Evaluation considerations
+The dataset contains 43 unique subjects. Heartbeats from one subject
+must not be split between training and testing sets.
+
+A Leave-One-Subject-Out (LOSO) structure was inspected, resulting in 43
+outer folds, with one subject held out in each fold. This was a
+structural split check; no model training or evaluation has yet been
+performed.
+
+Model tuning, feature selection, scaling, and resampling must be carried
+out using only the training subjects within each outer fold. A nested or
+otherwise properly grouped validation procedure will be needed.
+
+The four-class dataset is highly imbalanced, particularly for F.
+Accuracy alone will not be sufficient. Macro-F1, balanced accuracy,
+per-class precision/recall/F1, confusion matrices, and suitable
+precision-recall analyses will be considered.
+Current status of Notebook 02
+  Activity                            Status
+  Recording and subject               Completed
+identification                      
+
+  Provisional AAMI mapping and class  Completed provisionally;
+selection                           verification pending
+
+  Heartbeat annotation extraction     Completed
+
+  Heartbeat segmentation              Completed
+
+  Preliminary waveform inspection     Completed
+
+  Segment-level descriptive           Completed
+statistics                          
+
+  Signal representation comparison    Completed
+
+  Recording 116 signal-quality        Completed provisionally
+investigation                       
+
+  Sensitivity dataset creation        Completed
+
+  Dataset saving                      Completed
+
+  Engineered feature extraction for   Not started
+model training                      
+
+  Traditional ML model training       Not started
+
+  Deep-learning model training        Not started
+
+  Hybrid model development            Not started
+
+  Diagnostic-driven model selection   Not started
+experiment                          
+Final subject-independent model     Not started
+evaluation
+6. Technologies and Tools
+The experiments currently use:
+- Python
+- Jupyter Notebook
+- NumPy
+- Pandas
+- SciPy
+- Matplotlib
+- Seaborn
+- WFDB
+- Statsmodels
+- Scikit-learn
+Additional modelling libraries may be added when the model experiments
+begin.
 
 ## 10. Citation and Data Acknowledgement
 
